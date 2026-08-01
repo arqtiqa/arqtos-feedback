@@ -1,0 +1,31 @@
+name: Issue forms
+
+# The forms in .github/ISSUE_TEMPLATE/ are this repository's ONLY function, and
+# GitHub fails them SILENTLY: a form that does not parse is ignored, the chooser
+# falls back to a blank issue box, and every field the form declared required
+# becomes optional with nothing reporting it. So the gate runs on any change to
+# the forms themselves or to the gate that checks them.
+on:
+  pull_request:
+    paths: ['.github/ISSUE_TEMPLATE/**', 'internal/issueforms/**', 'go.mod', 'go.sum', '.github/workflows/issue-forms.yml']
+  push:
+    branches: [main]
+    paths: ['.github/ISSUE_TEMPLATE/**', 'internal/issueforms/**', 'go.mod', 'go.sum', '.github/workflows/issue-forms.yml']
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v6
+        with: { go-version-file: go.mod }
+      # The gate reads repository state through `gh` — that a label a form
+      # applies EXISTS, that a contact link is readable by this repo's reader,
+      # that the security route ends somewhere real. Without a token those
+      # checks cannot run, and a gate that skips is worse than one that fails.
+      - run: go test ./internal/issueforms/ -count=1
+        env:
+          GH_TOKEN: ${{ github.token }}
