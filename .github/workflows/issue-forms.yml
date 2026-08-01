@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-go@v6
+      - uses: actions/setup-go@v7
         with: { go-version-file: go.mod }
       # The gate reads repository state through `gh` — that a label a form
       # applies EXISTS, that a contact link is readable by this repo's reader,
