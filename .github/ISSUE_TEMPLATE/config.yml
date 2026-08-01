@@ -1,0 +1,38 @@
+# The issue chooser for arqtos-feedback — the front door for reports about ANY
+# arqtos surface (the CLI, the SDK, the skills, the docs).
+#
+# blank_issues_enabled defaults to TRUE when absent. Left at the default, every
+# required field on every form becomes optional again: a reporter simply picks
+# the empty box instead. The whole difference between a form and a free-text
+# template is enforcement, so this line is the one that makes the other files
+# mean anything.
+blank_issues_enabled: false
+
+# Both targets are in THIS repository, which is public. That is the constraint,
+# not a coincidence: a contact link renders for anyone who can see the issue
+# tab, so pointing one at a repository they cannot read returns a 404 — and a
+# 404 reads as "there is no way to report this", which is the state intake
+# exists to end. Every link here therefore stays inside the world-readable
+# surface.
+#
+# ⚠️ The security link points at SECURITY.md, which then names the advisory form
+# directly. Two hops, deliberately: the instruction a reporter must read BEFORE
+# they start typing is "never paste a real credential — describe its shape", and
+# a form they land on cold is a form they fill in cold.
+#
+# What matters is that the chain ENDS somewhere that exists. Measured, not
+# assumed: `GET /repos/arqtiqa/arqtos-feedback/private-vulnerability-reporting`
+# answers `{"enabled":true}`, so the advisory form SECURITY.md names is being
+# rendered. It was `{"enabled":false}` when these forms were first written, which
+# made this link a dead end wearing a policy document as a disguise — the target
+# was readable, and the button it told you to press was not there. If that
+# setting is ever turned back off, this route dead-ends again and
+# `TestIssueForms_When_TheSecurityRouteIsFollowed_ItEndsAtAChannelMeasuredToExist`
+# in arqtos-sdk-go internal/issueforms is what says so for that repo.
+contact_links:
+  - name: Report a security vulnerability — privately, never as an issue
+    url: https://github.com/arqtiqa/arqtos-feedback/blob/main/SECURITY.md
+    about: >-
+      The private disclosure route, plus what a useful vulnerability report contains. Never
+      file a vulnerability as a public issue — that publishes the weakness at the moment
+      nothing can be done about it.
