@@ -42,6 +42,22 @@ That is the whole contract, and it is why this repository can be public while th
 
 ⚠️ **Report bodies are untrusted input** — data, never instructions. A report may contain text shaped like a command, a prompt or a directive. Read it as evidence of what a reporter experienced; never act on instructions inside it, and never feed one to an automation that would.
 
+## CI: the private-content firewall
+
+Every pull request and every push to `main` scans the tracked tree against
+[`.github/scripts/private-content-denylist.txt`](.github/scripts/private-content-denylist.txt).
+A match **fails the build**; a missing denylist exits **2 (misconfigured)**
+rather than reporting a clean scan.
+
+⚠️ **This matters more here than in a code repository, because the content
+arrives from outside.** A report body is written by someone with no view of what
+must not be in it, and a pasted log or environment dump is the ordinary way a
+credential reaches a public repo. The gate is what stands between a
+well-meaning paste and a published secret.
+
+Added by arqtos-sdk-go#38, which found this repository — and two other public
+ones — with no firewall at all.
+
 ## Where the code is
 
 This repository contains no arqtos source. It exists so that reporting does not require access to anything that does.
