@@ -31,10 +31,57 @@ jobs:
         # is a GATE. A compromised gate does not break the build — it returns a
         # GREEN CHECK on a repo whose scan is no longer running. Bump
         # deliberately, reading the diff.
-        uses: arqtiqa/arqtos-actions/.github/actions/firewall@e294a60d6ccc7e579d61d5bb5a6ea97f41785e2d  # v1
+        #
+        # ⚠️ BUMPED FROM e294a60d, AND THE BUMP IS REQUIRED, NOT COSMETIC. That
+        # pin predates the `.firewallignore` exemptions mechanism entirely
+        # (arqtiqa/arqtos#341), and the probe corpus this repo now carries is a
+        # file of denylist-shaped strings that the gate matches BY
+        # CONSTRUCTION — without exemptions there is no way to hold the gate
+        # green over it except by weakening the denylist or by a silent
+        # exclusion, and a silent exclusion is the defect class arqtos#343 was
+        # filed for.
+        #
+        # ⚠️ AND IT MOVES IN LOCKSTEP WITH THE FALSIFIER BELOW. The falsifier
+        # drives the scanner sitting BESIDE IT at its own pin, so two different
+        # SHAs would prove one scanner build alive while a different build
+        # guarded this repository — the most convincing possible form of no
+        # coverage. Verified on this repository's real tree at the new SHA:
+        # exit 0, 11 patterns, 11 file/rule pairs exempted.
+        #
+        # The bump carries arqtos#341 (exemptions), #343 (a same-basename file
+        # must also be byte-identical before the vendored-denylist skip drops
+        # it), #348 (an input description no longer evaluates as a template
+        # expression, which had made this action unloadable for every consumer)
+        # and #365 (an exemption may name an identity-overlay rule by handle;
+        # inert here, this repo wires no overlay).
+        uses: arqtiqa/arqtos-actions/.github/actions/firewall@84970353712d49a6e971a271b89864c151e60f3e  # arqtos#341 exemptions + #343 basename-skip + #348 loadable + #365 overlay exemptions
         with:
           # ⚠️ The denylist lives HERE and is passed in; the action ships none,
           # so a missing one is exit 2 (misconfigured) rather than a silent pass.
           # The list is the estate's public subset — generic credential shapes
           # and private-network ranges, no identity patterns.
+          denylist: .github/scripts/private-content-denylist.txt
+
+      # ⚠️ THE STEP ABOVE BEING GREEN IS NOT EVIDENCE THE DENYLIST STILL BITES
+      # (arqtiqa/arqtos#361).
+      #
+      # Until now this repository's list rested on a ONE-TIME MANUAL DRY-RUN
+      # performed on the day the gate was enabled — evidence it bit once, on one
+      # day, against one tree. Nothing re-ran it, and every way a denylist
+      # decays leaves the gate GREEN: a rule edited into a form that still
+      # COMPILES but matches nothing (arqtos-cli#1092 was exactly that one level
+      # down — the shared script reported CLEAN when `grep` REJECTED a pattern),
+      # a rule deleted during an unrelated edit, a rule added with nothing
+      # behind it. A green firewall over a dead denylist is worse than no
+      # firewall, because it is trusted — and this repository is PUBLIC, which
+      # is where that costs the most.
+      #
+      # The corpus it reads (`.firewall-probes`) is a file of SYNTHETIC strings
+      # engineered to fire this repo's list — shaped LIKE a credential, never an
+      # instance of one. See both files' own headers.
+      - name: Prove every denylist rule still bites
+        uses: arqtiqa/arqtos-actions/.github/actions/firewall-falsifier@84970353712d49a6e971a271b89864c151e60f3e  # arqtos#361
+        with:
+          # ⚠️ THE SAME list the gate above scans. Proving a different list
+          # alive is the most convincing possible form of no coverage.
           denylist: .github/scripts/private-content-denylist.txt
