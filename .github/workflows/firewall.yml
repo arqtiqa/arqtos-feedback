@@ -41,12 +41,21 @@ jobs:
         # exclusion, and a silent exclusion is the defect class arqtos#343 was
         # filed for.
         #
-        # ⚠️ AND IT MOVES IN LOCKSTEP WITH THE FALSIFIER BELOW. The falsifier
-        # drives the scanner sitting BESIDE IT at its own pin, so two different
-        # SHAs would prove one scanner build alive while a different build
-        # guarded this repository — the most convincing possible form of no
-        # coverage. Verified on this repository's real tree at the new SHA:
-        # exit 0, 11 patterns, 11 file/rule pairs exempted.
+        # ⚠️ AND IT NAMES v1's COMMIT, SO THIS GATE RUNS THE SAME SCANNER BUILD
+        # THE FALSIFIER BELOW DOES. The falsifier drives the scanner sitting
+        # BESIDE IT, at its own ref — and its ref is `@v1`, not a SHA (only the
+        # firewall may be SHA-pinned; see arqtos-actions' ci-baseline.yml for
+        # that rule and for the refused proposal to widen it). Pinning this at
+        # v1's own commit makes the two agree exactly rather than merely
+        # probably.
+        #
+        # ⚠️ Nothing enforces that agreement — it is the standing cost of the
+        # moving tag. If `v1` later moves to a commit carrying a different
+        # scanner, the falsifier would prove this list alive under one engine
+        # while this gate ran another. Re-check this line whenever `v1` moves.
+        #
+        # Verified on this repository's real tree at this SHA: exit 0, 11
+        # patterns, 11 file/rule pairs exempted.
         #
         # The bump carries arqtos#341 (exemptions), #343 (a same-basename file
         # must also be byte-identical before the vendored-denylist skip drops
@@ -54,7 +63,7 @@ jobs:
         # expression, which had made this action unloadable for every consumer)
         # and #365 (an exemption may name an identity-overlay rule by handle;
         # inert here, this repo wires no overlay).
-        uses: arqtiqa/arqtos-actions/.github/actions/firewall@84970353712d49a6e971a271b89864c151e60f3e  # arqtos#341 exemptions + #343 basename-skip + #348 loadable + #365 overlay exemptions
+        uses: arqtiqa/arqtos-actions/.github/actions/firewall@dc1f8ad663357a54898ae416f21689db2d45537a  # arqtos#341 exemptions + #343 basename-skip + #348 loadable + #365 overlay exemptions
         with:
           # ⚠️ The denylist lives HERE and is passed in; the action ships none,
           # so a missing one is exit 2 (misconfigured) rather than a silent pass.
@@ -80,7 +89,7 @@ jobs:
       # engineered to fire this repo's list — shaped LIKE a credential, never an
       # instance of one. See both files' own headers.
       - name: Prove every denylist rule still bites
-        uses: arqtiqa/arqtos-actions/.github/actions/firewall-falsifier@84970353712d49a6e971a271b89864c151e60f3e  # arqtos#361
+        uses: arqtiqa/arqtos-actions/.github/actions/firewall-falsifier@v1  # arqtos#361
         with:
           # ⚠️ THE SAME list the gate above scans. Proving a different list
           # alive is the most convincing possible form of no coverage.
