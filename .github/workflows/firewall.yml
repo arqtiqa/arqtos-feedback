@@ -63,7 +63,7 @@ jobs:
         # expression, which had made this action unloadable for every consumer)
         # and #365 (an exemption may name an identity-overlay rule by handle;
         # inert here, this repo wires no overlay).
-        uses: arqtiqa/arqtos-actions/.github/actions/firewall@dc1f8ad663357a54898ae416f21689db2d45537a  # arqtos#341 exemptions + #343 basename-skip + #348 loadable + #365 overlay exemptions
+        uses: arqtiqa/arqtos-actions/.github/actions/firewall@aaaf6d5da05725b6c2b0d08ddd651b68d9ad84af  # v1.2.0
         with:
           # ⚠️ The denylist lives HERE and is passed in; the action ships none,
           # so a missing one is exit 2 (misconfigured) rather than a silent pass.
